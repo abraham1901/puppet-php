@@ -222,13 +222,14 @@ class php (
     false => true,
   }
 
-  if ($php::source and $php::template) {
+  if ($php::source != '' and $php::source != false and $php::template != '' and
+  $php::template != false) {
     fail ('PHP: cannot set both source and template')
   }
-  if ($php::source and $php::bool_augeas) {
+  if ($php::source != '' and $php::source != false and $php::bool_augeas) {
     fail ('PHP: cannot set both source and augeas')
   }
-  if ($php::template and $php::bool_augeas) {
+  if ($php::template != '' and $php::template != false and $php::bool_augeas) {
     fail ('PHP: cannot set both template and augeas')
   }
 
@@ -248,9 +249,8 @@ class php (
   }
 
   ### Managed resources
-  package { 'php':
+  package { $php::package:
     ensure          => $php::manage_package,
-    name            => $php::package,
     install_options => $php::install_options,
   }
 
@@ -260,7 +260,7 @@ class php (
     mode    => $php::config_file_mode,
     owner   => $php::config_file_owner,
     group   => $php::config_file_group,
-    require => Package['php'],
+    require => Package[$php::package],
     source  => $php::manage_file_source,
     content => $php::manage_file_content,
     replace => $php::manage_file_replace,
@@ -269,11 +269,11 @@ class php (
   }
 
   # The whole php configuration directory can be recursively overriden
-  if $php::source_dir {
+  if $php::source_dir != '' and $php::source_dir != false {
     file { 'php.dir':
       ensure  => directory,
       path    => $php::config_dir,
-      require => Package['php'],
+      require => Package[$php::package],
       source  => $php::source_dir,
       recurse => true,
       links   => follow,
@@ -286,7 +286,7 @@ class php (
 
 
   ### Include custom class if $my_class is set
-  if $php::my_class {
+  if $php::my_class != '' and  $php::my_class != false {
     include $php::my_class
   }
 

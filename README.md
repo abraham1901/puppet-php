@@ -87,6 +87,10 @@ For detailed info about the logic and usage patterns of Example42 modules check 
             disable => true,
         }
 
+* Installing and configuring a Module. This will guarantee correct execution order in your classes
+
+        php::module { 'sqlite': } -> php::mod { 'sqlite3': }
+
 ## USAGE - Pear Management
 
 * Install a pear package

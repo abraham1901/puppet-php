@@ -50,12 +50,13 @@ define php::module (
   $install_options     = [],
   $service_autorestart = '',
   $module_prefix       = '',
-  $absent              = ''
+  $absent              = '',
+  $package             = $php::package
   ) {
 
   include php
 
-  if $absent {
+  if $absent != '' and $absent != false {
     $real_version = 'absent'
   } else {
     $real_version = $version
@@ -88,7 +89,7 @@ define php::module (
       name            => $real_install_package,
       notify          => $real_service_autorestart,
       install_options => $real_install_options,
-      require         => Package['php'],
+      require         => Package[$package],
     }
   }
 

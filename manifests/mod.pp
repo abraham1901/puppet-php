@@ -39,10 +39,11 @@ define php::mod (
   $disable              = false,
   $service_autorestart  = '',
   $path                 = '/usr/bin:/bin:/usr/sbin:/sbin',
+  $package              = $php::package
   $version              = '5',
-) {
+  ) {
 
-#  include php
+  include php
   case $version {
    '7': {
       $php_mod_enable   = 'phpenmod'
@@ -56,12 +57,6 @@ define php::mod (
     }
   }
 
-  if $disable {
-    $php_mod_tool = $php_mod_disable
-  } else {
-    $php_mod_tool = $php_mod_enable
-  }
-
   $real_service_autorestart = $service_autorestart ? {
     true    => "Service[${php::service}]",
     false   => undef,
@@ -71,11 +66,22 @@ define php::mod (
     }
   }
 
-  exec { "php_mod_tool_${name}":
-    command     => "${php_mod_tool} ${name}",
-    path        => $path,
-    notify      => $real_service_autorestart,
-    require     => Package[ $pkg_fpm ],
+  if $disable {
+      exec { "php_mod_tool_disable_${name}":
+        command => "${php_mod_disable} ${name}",
+        path    => $path,
+        notify  => $real_service_autorestart,
+        require => Package[$package],
+        onlyif  => "php5query -M | grep -q '^${name}$'",
+      }
+  } else {
+      exec { "php_mod_tool_enable_${name}":
+        command => "${php_mod_enable} ${name}",
+        path    => $path,
+        notify  => $real_service_autorestart,
+        require => Package[$package],
+        unless  => "php5query -M | grep -q '^${name}$'",
+      }
   }
 
 }
