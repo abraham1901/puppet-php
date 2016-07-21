@@ -17,11 +17,11 @@ class php::params {
   if ($::lsbdistrelease == '16.04') {
     $package_devel = 'php-dev'
   } else {
-  $package_devel = $::operatingsystem ? {
-    /(?i:Ubuntu|Debian|Mint)/ => 'php5-dev',
-    /(?i:SLES|OpenSuSe)/      => 'php5-devel',
-    default                   => 'php-devel',
-  }
+    $package_devel = $::operatingsystem ? {
+      /(?i:Ubuntu|Debian|Mint)/ => 'php5-dev',
+      /(?i:SLES|OpenSuSe)/      => 'php5-devel',
+      default                   => 'php-devel',
+    }
   }
   $package_pear = $::operatingsystem ? {
     /(?i:Ubuntu|Debian|Mint)/ => 'php-pear',

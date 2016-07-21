@@ -39,7 +39,7 @@ define php::mod (
   $disable              = false,
   $service_autorestart  = '',
   $path                 = '/usr/bin:/bin:/usr/sbin:/sbin',
-  $package              = $php::package
+  $package              = $php::package,
   $version              = '5',
   ) {
 
@@ -49,11 +49,13 @@ define php::mod (
       $php_mod_enable   = 'phpenmod'
       $php_mod_disable  = 'phpdismod'
       $pkg_fpm          = 'php7.0-fpm'
+      $phpquery         = 'phpquery'
     }
     default: {
       $php_mod_enable   = 'php5enmod'
       $php_mod_disable  = 'php5dismod'
       $pkg_fpm          = 'php5-fpm'
+      $phpquery         = 'php5query'
     }
   }
 
@@ -72,7 +74,7 @@ define php::mod (
         path    => $path,
         notify  => $real_service_autorestart,
         require => Package[$package],
-        onlyif  => "php5query -M | grep -q '^${name}$'",
+        onlyif  => "${phpquery} -M | grep -q '^${name}$'",
       }
   } else {
       exec { "php_mod_tool_enable_${name}":
@@ -80,7 +82,7 @@ define php::mod (
         path    => $path,
         notify  => $real_service_autorestart,
         require => Package[$package],
-        unless  => "php5query -M | grep -q '^${name}$'",
+        unless  => "${phpquery} -M | grep -q '^${name}$'",
       }
   }
 
