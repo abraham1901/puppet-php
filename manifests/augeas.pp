@@ -58,7 +58,7 @@ define php::augeas (
   $value  = '',
   ) {
 
-  include php
+#  include php
 
   $service = $php::service
 

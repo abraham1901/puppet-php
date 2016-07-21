@@ -38,15 +38,28 @@
 define php::mod (
   $disable              = false,
   $service_autorestart  = '',
-  $path                 = '/usr/bin:/bin:/usr/sbin:/sbin'
-  ) {
+  $path                 = '/usr/bin:/bin:/usr/sbin:/sbin',
+  $version              = '5',
+) {
 
-  include php
+#  include php
+  case $version {
+   '7': {
+      $php_mod_enable   = 'phpenmod'
+      $php_mod_disable  = 'phpdismod'
+      $pkg_fpm          = 'php7.0-fpm'
+    }
+    default: {
+      $php_mod_enable   = 'php5enmod'
+      $php_mod_disable  = 'php5dismod'
+      $pkg_fpm          = 'php5-fpm'
+    }
+  }
 
   if $disable {
-    $php_mod_tool = 'php5dismod'
+    $php_mod_tool = $php_mod_disable
   } else {
-    $php_mod_tool = 'php5enmod'
+    $php_mod_tool = $php_mod_enable
   }
 
   $real_service_autorestart = $service_autorestart ? {
@@ -62,7 +75,7 @@ define php::mod (
     command     => "${php_mod_tool} ${name}",
     path        => $path,
     notify      => $real_service_autorestart,
-    require     => Package['php'],
+    require     => Package[ $pkg_fpm ],
   }
 
 }
